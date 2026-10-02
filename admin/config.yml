@@ -1,0 +1,65 @@
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+publish_mode: simple
+media_folder: "uploads"
+public_folder: "/uploads"
+site_url: https://YOUR-SITE.netlify.app
+display_url: https://YOUR-SITE.netlify.app
+
+collections:
+  - name: songs
+    label: "Songs / పాటలు"
+    label_singular: "Song"
+    folder: "content/songs"
+    extension: "json"
+    format: "json"
+    create: true
+    slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
+    identifier_field: title
+    summary: "{{title}} — {{category}}"
+    sortable_fields: ["date", "title", "category"]
+    fields:
+      - { label: "Title (Telugu) / పాట పేరు", name: "title", widget: "string" }
+      - { label: "Title (English, optional)", name: "title_en", widget: "string", required: false }
+      - label: "Category / విభాగం"
+        name: "category"
+        widget: "select"
+        options: ["ఆరాధన గీతాలు", "స్తోత్ర గీతాలు", "క్రిస్మస్ పాటలు", "ఈస్టర్ పాటలు", "ఉజ్జీవ గీతాలు", "పిల్లల పాటలు", "ప్రార్థన గీతాలు", "ఇతర"]
+        default: "ఆరాధన గీతాలు"
+      - { label: "Writer / రచయిత", name: "writer", widget: "string", required: false }
+      - { label: "Scale (e.g. C, Dm)", name: "scale", widget: "string", required: false }
+      - { label: "Lyrics as TEXT (type or paste)", name: "lyrics", widget: "text", required: false, hint: "Leave a blank line between verses. Use text, photo, or both." }
+      - { label: "Lyrics as PHOTO (upload image of the song)", name: "lyrics_image", widget: "image", required: false, choose_url: false }
+      - { label: "Audio file (optional)", name: "audio", widget: "file", required: false, choose_url: false }
+      - { label: "YouTube link (optional)", name: "youtube", widget: "string", required: false }
+      - { label: "Featured on home page", name: "featured", widget: "boolean", default: false }
+      - { label: "Published", name: "published", widget: "boolean", default: true }
+      - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD HH:mm", date_format: "YYYY-MM-DD", time_format: "HH:mm" }
+
+  - name: settings
+    label: "Site Settings"
+    files:
+      - label: "General Settings"
+        name: "general"
+        file: "content/settings.json"
+        format: "json"
+        fields:
+          - { label: "Site name", name: "site_name", widget: "string", default: "Dhaivakrupa Ujjeevakeerthanalu" }
+          - { label: "Site name (Telugu)", name: "site_name_te", widget: "string", default: "దైవకృప ఉజ్జీవకీర్తనలు" }
+          - { label: "Tagline", name: "tagline", widget: "string", required: false }
+          - { label: "Logo (optional)", name: "logo", widget: "image", required: false, choose_url: false }
+          - { label: "Favicon emoji", name: "favicon", widget: "string", default: "✝️", required: false }
+          - { label: "Hero Bible verse", name: "verse", widget: "text", required: false }
+          - { label: "Hero verse reference", name: "verse_ref", widget: "string", required: false }
+          - { label: "Accent colour", name: "accent", widget: "color", default: "#B8892B" }
+          - { label: "Main colour", name: "ink", widget: "color", default: "#17305C" }
+          - { label: "About text", name: "about", widget: "text", required: false }
+          - { label: "Contact email", name: "email", widget: "string", required: false }
+          - { label: "WhatsApp number (with country code, e.g. 919876543210)", name: "whatsapp", widget: "string", required: false }
+          - { label: "YouTube channel URL", name: "youtube", widget: "string", required: false }
+          - { label: "Facebook URL", name: "facebook", widget: "string", required: false }
+          - { label: "Footer text", name: "footer", widget: "string", default: "దేవునికే మహిమ కలుగును గాక", required: false }
+          - { label: "SEO description", name: "seo_description", widget: "text", required: false }
