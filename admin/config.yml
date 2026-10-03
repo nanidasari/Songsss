@@ -19,10 +19,10 @@ collections:
     create: true
     slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
     identifier_field: title
-    summary: "{{title}} — {{category}}"
+    summary: "{{title}} {{category}}"
     sortable_fields: ["date", "title", "category"]
     fields:
-      - { label: "Title (Telugu) / పాట పేరు", name: "title", widget: "string" }
+      - { label: "Title (Telugu) / పాట పేరు", name: "title", widget: "string", required: false, hint: "Required unless you upload an XML file that contains titles." }
       - { label: "Title (English, optional)", name: "title_en", widget: "string", required: false }
       - label: "Category / విభాగం"
         name: "category"
@@ -33,6 +33,7 @@ collections:
       - { label: "Scale (e.g. C, Dm)", name: "scale", widget: "string", required: false }
       - { label: "Lyrics as TEXT (type or paste)", name: "lyrics", widget: "text", required: false, hint: "Leave a blank line between verses. Use text, photo, or both." }
       - { label: "Lyrics as PHOTO (upload image of the song)", name: "lyrics_image", widget: "image", required: false, choose_url: false }
+      - { label: "XML file upload (one or many songs)", name: "xml_file", widget: "file", required: false, choose_url: false, hint: "See sample-songs.xml. Every <song> inside the file is added to the site automatically." }
       - { label: "Audio file (optional)", name: "audio", widget: "file", required: false, choose_url: false }
       - { label: "YouTube link (optional)", name: "youtube", widget: "string", required: false }
       - { label: "Featured on home page", name: "featured", widget: "boolean", default: false }
