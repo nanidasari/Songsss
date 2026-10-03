@@ -75,6 +75,26 @@ audio{width:100%;margin-top:16px}.view .media a{color:var(--accent);font-weight:
 .about{padding:20px 16px;text-align:center;color:var(--muted)}.about a{color:var(--ink);font-weight:600;display:block;padding:6px}
 .toast{position:fixed;bottom:calc(var(--nav) + 24px);left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 18px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;z-index:40}
 .toast.on{opacity:1}
+
+/* projector */
+#pj{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;--pb:#000;--pt:#fff;--pa:#F6D98B;background:var(--pb);color:var(--pt);user-select:none}
+#pj.on{display:flex}
+#pj[data-th=light]{--pb:#fff;--pt:#111827;--pa:#9A6B12}
+#pj[data-th=blue]{--pb:#0B1F44;--pt:#F3F6FF;--pa:#F6D98B}
+#pj .st{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:4vmin 6vmin 12vmin;overflow:hidden;cursor:pointer}
+#pj .in{max-width:100%;transition:opacity .2s}
+#pj.blank .in{opacity:0}
+#pj .pj-l{font:700 1em/1.55 var(--serif);white-space:pre-line}
+#pj .pj-e{font:500 .55em/1.5 var(--sans);opacity:.85;margin-top:.5em;white-space:pre-line}
+#pj .pj-ref{font:600 .4em var(--sans);color:var(--pa);margin-bottom:.6em}
+#pj .pj-t{font:700 1.3em/1.4 var(--serif)}
+#pj .pj-s{font:500 .6em/1.5 var(--sans);color:var(--pa);margin-top:.5em}
+#pj img{max-width:100%;max-height:80vh;border-radius:6px}
+#pj .ct{position:absolute;left:0;right:0;bottom:0;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;padding:12px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.6));transition:opacity .3s;font-size:.9rem}
+#pj.idle .ct{opacity:0;pointer-events:none}#pj.idle .st{cursor:none}
+#pj .ct button{border:1px solid rgba(255,255,255,.35);background:rgba(20,20,20,.75);color:#fff;border-radius:999px;min-width:44px;height:44px;padding:0 14px}
+#pj .cnt{color:#fff;min-width:64px;text-align:center;font-weight:600}
+#pj .bar2{position:absolute;left:0;right:0;top:0;height:5px}#pj .bar2 i{display:block;height:100%;background:var(--pa);width:0;transition:width .25s}
 @media (prefers-reduced-motion:reduce){.banner::before{animation:none}}
 </style></head>
 <body>
@@ -87,6 +107,15 @@ audio{width:100%;margin-top:16px}.view .media a{color:var(--accent);font-weight:
  <a href="#/bible" data-t="bible"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22.5z"/><path d="M12 6v8M8.5 9h7"/></svg>బైబిల్</a>
  <a href="#/about" data-t="about"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>గురించి</a>
 </div></nav>
+<div id="pj" role="dialog" aria-modal="true" aria-label="Projector presentation" data-th="dark">
+ <div class="bar2"><i id="pjbar"></i></div>
+ <div class="st" id="pjst"><div class="in" id="pjc"></div></div>
+ <div class="ct" id="pjct">
+  <button id="pjp" aria-label="Previous slide">‹</button><span class="cnt" id="pjn"></span><button id="pjnx" aria-label="Next slide">›</button>
+  <button id="pjm" aria-label="Smaller text">A−</button><button id="pjl" aria-label="Larger text">A+</button>
+  <button id="pjt" aria-label="Change colours">🎨</button><button id="pjb" aria-label="Blank screen">⬛</button>
+  <button id="pjf" aria-label="Full screen">⛶</button><button id="pjx" aria-label="Close presentation">✕ మూసివేయి</button>
+ </div></div>
 <div class="toast" id="toast" role="status"></div>
 <script>
 const $=s=>document.querySelector(s), M=$('#main');
@@ -144,12 +173,13 @@ function songView(id){
   const i=D.songs.indexOf(x),p=D.songs[i-1],n=D.songs[i+1];
   M.innerHTML=`<article class="view"><h2>${esc(x.title)}</h2>
   <p class="meta">${esc([x.title_en,x.category,x.writer&&'రచన: '+x.writer,x.scale&&'స్కేల్: '+x.scale].filter(Boolean).join(' • '))}</p>
-  <div class="tb"><button id="sm" aria-label="Smaller text">A−</button><button id="lg" aria-label="Larger text">A+</button><button id="cp">కాపీ</button><button id="sh">షేర్</button></div>
+  <div class="tb"><button id="sm" aria-label="Smaller text">A−</button><button id="lg" aria-label="Larger text">A+</button><button id="cp">కాపీ</button><button id="sh">షేర్</button><button id="pj1">📽 ప్రొజెక్టర్</button></div>
   ${x.lyrics?`<div class="lyrics">${esc(x.lyrics)}</div>`:''}
   ${x.lyrics_image?`<img class="photo" src="${esc(x.lyrics_image)}" alt="${esc(x.title)} – పాట చిత్రం">`:''}
   ${x.audio?`<audio controls src="${esc(x.audio)}"></audio>`:''}
   ${x.youtube?`<p class="media"><a href="${esc(x.youtube)}" target="_blank" rel="noopener">YouTube లో వినండి</a></p>`:''}
   <div class="pn"><a class="${p?'':'off'}" href="#/song/${p?encodeURIComponent(p.id):''}">‹ ముందు</a><a class="${n?'':'off'}" href="#/song/${n?encodeURIComponent(n.id):''}">తరువాత ›</a></div></article>`;
+  $('#pj1').onclick=()=>present(songSlides(x));
   $('#sm').onclick=()=>setFs(fs-.1);$('#lg').onclick=()=>setFs(fs+.1);
   $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(x.title+'\n\n'+(x.lyrics||'')+'\n\n'+location.href);toast('కాపీ అయింది')}catch{toast('కాపీ కాలేదు')}};
   $('#sh').onclick=()=>navigator.share?navigator.share({title:x.title,url:location.href}).catch(()=>{}):$('#cp').click();
@@ -188,7 +218,7 @@ async function read(b,c){
   const prev=c>1?`#/bible/${b}/${c-1}`:b>0?`#/bible/${b-1}/${books[b-1].ch}`:'',next=c<bk.ch?`#/bible/${b}/${c+1}`:b<books.length-1?`#/bible/${b+1}/1`:'';
   M.innerHTML=`<div class="view"><a href="#/bible/${b}" style="color:var(--muted);text-decoration:none">‹ ${esc(blang==='en'?bk.en:bk.te)} అధ్యాయాలు</a>
   <h2>${esc(blang==='en'?bk.en:bk.te)} ${c}</h2>${blang==='both'?`<p class="meta">${esc(bk.en)} ${c}</p>`:''}
-  <div class="tb" style="margin-top:12px">${langSeg()}<button id="sm" aria-label="Smaller text">A−</button><button id="lg" aria-label="Larger text">A+</button><button id="cp">కాపీ</button></div>
+  <div class="tb" style="margin-top:12px">${langSeg()}<button id="sm" aria-label="Smaller text">A−</button><button id="lg" aria-label="Larger text">A+</button><button id="cp">కాపీ</button><button id="pj1">📽 ప్రొజెక్టర్</button></div>
   <div id="vs">${Array.from({length:n},(_,i)=>`<span class="v" data-i="${i}"><sup>${i+1}</sup>${te[i]?`<span class="te">${esc(te[i])}</span>`:''}${en[i]?`<span class="en${te[i]?'':' only'}">${esc(en[i])}</span>`:''}</span>`).join('')}</div>
   <div class="pn"><a class="${prev?'':'off'}" href="${prev||'#'}">‹ ముందు</a><a class="${next?'':'off'}" href="${next||'#'}">తరువాత ›</a></div></div>`;
   window.scrollTo(0,0);
@@ -199,8 +229,68 @@ async function read(b,c){
     const txt=vs.map(v=>{const i=+v.dataset.i;return `${i+1}. ${[te[i],en[i]].filter(Boolean).join('\n   ')}`}).join('\n');
     const ref=`${blang==='en'?bk.en:bk.te} ${c}${sel.length&&sel.length<4?':'+sel.map(v=>+v.dataset.i+1).join(','):''}`;
     try{await navigator.clipboard.writeText(ref+'\n'+txt);toast(sel.length?'ఎంచుకున్న వచనాలు కాపీ అయ్యాయి':'అధ్యాయం కాపీ అయింది')}catch{toast('కాపీ కాలేదు')}};
+  $('#pj1').onclick=()=>{
+    const ref=`${blang==='en'?bk.en:bk.te} ${c}`,sel=[...document.querySelectorAll('.v.sel')].map(v=>+v.dataset.i);
+    const idx=sel.length?sel:Array.from({length:n},(_,i)=>i);
+    present(idx.map(i=>({h:`<div class="pj-ref">${esc(ref)}:${i+1}</div>${te[i]?`<div class="pj-l">${esc(te[i])}</div>`:''}${en[i]?`<div class="${te[i]?'pj-e':'pj-l'}">${esc(en[i])}</div>`:''}`})));
+  };
   bindSeg(()=>read(b,c));
 }
+
+/* ---------- Projector ---------- */
+const PJ={slides:[],i:0,scale:LS.get('pjs',1),th:LS.get('pjt','dark'),idle:null,lock:null};
+function chunk(text){return text.split(/\n\s*\n/).map(t=>t.trim()).filter(Boolean).flatMap(t=>{const L=t.split('\n');if(L.length<=6)return[t];const o=[];for(let i=0;i<L.length;i+=4)o.push(L.slice(i,i+4).join('\n'));return o})}
+function songSlides(x){
+  const sl=[{h:`<div class="pj-t">${esc(x.title)}</div><div class="pj-s">${esc([x.title_en,x.writer].filter(Boolean).join(' • '))}</div>`}];
+  chunk(x.lyrics||'').forEach(t=>sl.push({h:`<div class="pj-l">${esc(t)}</div>`}));
+  if(!x.lyrics&&x.lyrics_image)sl.push({h:`<img src="${esc(x.lyrics_image)}" alt="">`,img:1});
+  return sl;
+}
+function pjFit(){
+  const st=$('#pjst'),c=$('#pjc');let sz=PJ.scale*Math.min(innerWidth,innerHeight)*.085;
+  const has=c.querySelector('img');c.style.fontSize=sz+'px';if(has)return;
+  const cap=st.clientHeight-st.clientHeight*.0;let n=0;
+  while((c.scrollHeight>st.clientHeight-parseFloat(getComputedStyle(st).paddingTop)-parseFloat(getComputedStyle(st).paddingBottom)||c.scrollWidth>st.clientWidth)&&sz>14&&n++<40){sz*=.93;c.style.fontSize=sz+'px'}
+}
+function pjShow(i){
+  PJ.i=Math.max(0,Math.min(PJ.slides.length-1,i));
+  $('#pjc').innerHTML=PJ.slides[PJ.i].h;pjFit();
+  $('#pjn').textContent=`${PJ.i+1} / ${PJ.slides.length}`;
+  $('#pjbar').style.width=((PJ.i+1)/PJ.slides.length*100)+'%';
+}
+function pjWake(){const k=()=>{clearTimeout(PJ.idle);$('#pj').classList.remove('idle');PJ.idle=setTimeout(()=>$('#pj').classList.add('idle'),3000)};PJ.k=k;k()}
+function pjKey(e){
+  const K=e.key;if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(K)){e.preventDefault();pjShow(PJ.i+1)}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(K)){e.preventDefault();pjShow(PJ.i-1)}
+  else if(K==='Home')pjShow(0);else if(K==='End')pjShow(PJ.slides.length-1);
+  else if(K==='Escape')pjClose();else if(K==='b'||K==='B'||K==='.')$('#pj').classList.toggle('blank');
+  else if(K==='f'||K==='F')pjFull();else if(K==='+'||K==='=')pjSize(.1);else if(K==='-')pjSize(-.1);
+  PJ.k&&PJ.k();
+}
+function pjSize(d){PJ.scale=Math.min(2,Math.max(.4,PJ.scale+d));LS.set('pjs',PJ.scale);pjShow(PJ.i)}
+function pjFull(){const e=document.documentElement;if(document.fullscreenElement)document.exitFullscreen();else e.requestFullscreen?.().catch(()=>toast('Full screen లభ్యం కాదు'))}
+function pjClose(){
+  $('#pj').classList.remove('on','blank','idle');document.body.style.overflow='';
+  removeEventListener('keydown',pjKey);removeEventListener('resize',pjRe);
+  if(document.fullscreenElement)document.exitFullscreen();PJ.lock?.release?.();PJ.lock=null;
+}
+const pjRe=()=>pjShow(PJ.i);
+async function present(slides,start=0){
+  PJ.slides=slides;const p=$('#pj');p.dataset.th=PJ.th;p.classList.add('on');document.body.style.overflow='hidden';
+  addEventListener('keydown',pjKey);addEventListener('resize',pjRe);pjShow(start);pjWake();
+  try{PJ.lock=await navigator.wakeLock?.request('screen')}catch{}
+}
+(()=>{
+  const p=$('#pj'),th=['dark','blue','light'];
+  p.addEventListener('mousemove',()=>PJ.k&&PJ.k());p.addEventListener('touchstart',()=>PJ.k&&PJ.k(),{passive:true});
+  $('#pjst').onclick=e=>{pjShow(PJ.i+(e.clientX<innerWidth*.3?-1:1))};
+  let sx=null;$('#pjst').addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+  $('#pjst').addEventListener('touchend',e=>{if(sx==null)return;const d=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(d)>50){e.preventDefault();pjShow(PJ.i+(d<0?1:-1))}});
+  $('#pjp').onclick=()=>pjShow(PJ.i-1);$('#pjnx').onclick=()=>pjShow(PJ.i+1);
+  $('#pjm').onclick=()=>pjSize(-.1);$('#pjl').onclick=()=>pjSize(.1);
+  $('#pjt').onclick=()=>{PJ.th=th[(th.indexOf(PJ.th)+1)%3];LS.set('pjt',PJ.th);p.dataset.th=PJ.th};
+  $('#pjb').onclick=()=>p.classList.toggle('blank');$('#pjf').onclick=pjFull;$('#pjx').onclick=pjClose;
+})();
 
 /* ---------- About ---------- */
 function about(){

@@ -29,3 +29,7 @@ Telugu and English (KJV) Bible text lives in `bible/` (one JSON file per book, l
 
 ## Install as an app
 Open the site on a phone and choose "Add to Home Screen".
+
+## Projector mode
+Open any song or Bible chapter and tap **ప్రొజెక్టర్**. Each verse/stanza becomes a full-screen slide with auto-fitting large text.
+Keys: → / Space next, ← back, B blank screen, F full screen, + / − text size, Esc close. Touch: swipe or tap left/right. In the Bible, tap verses first to project only the selected ones.
